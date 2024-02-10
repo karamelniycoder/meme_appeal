@@ -4,7 +4,7 @@ from eth_account import Account
 from utilities.common import create_client
 
 
-class CheckStatus():
+class CheckStatus:
     def __init__(self, index, private_key, proxy) -> None:
         self.index = index
         self.private_key = private_key
@@ -17,7 +17,7 @@ class CheckStatus():
             proxy_change_link = None
 
         self.proxy = proxy
-        self.client = create_client(proxy, proxy_change_link)
+        self.client = create_client(proxy, proxy_change_link, index)
 
 
     def login(self):
@@ -53,13 +53,13 @@ class CheckStatus():
             won_status = response_data['results'][0]['won']
 
             if not won_status:
-                logger.warning(f'| {self.index} | {self.wallet.address} | Is robot')
+                logger.warning(f'{self.index} | {self.wallet.address} | Is robot')
                 response = self.client.get('https://memefarm-api.memecoin.org/user/info')
                 response_data = response.json()
                 username = response_data['twitter']['username']
                 return f"@{username}"
             else:
-                logger.success(f'| {self.index} | {self.wallet.address} | Is not robot')
+                logger.success(f'{self.index} | {self.wallet.address} | Is not robot')
                 return "Not robot"
 
         except Exception as e:

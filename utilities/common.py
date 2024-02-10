@@ -16,7 +16,7 @@ def read_files():
     with open("./data/discord_tokens.txt") as file:
         tokens = [line.strip() for line in file if line.strip()]
 
-    with open("./data/appeal_text.txt") as file:
+    with open("./data/appeal_text.txt", encoding='utf-8') as file:
         answers = [line.strip() for line in file if line.strip()]
 
     while len(proxies) < len(private_keys):
@@ -24,19 +24,19 @@ def read_files():
 
     return private_keys, tokens, proxies, answers
 
-def create_client(proxy: str, proxy_change_link: str) -> requests.Session:
+def create_client(proxy: str, proxy_change_link: str, index: str) -> requests.Session:
     session = requests.Session()
 
     if proxy_change_link:
         while True:
             r = session.get(proxy_change_link)
             if 'mobileproxy' in proxy_change_link and r.json().get('status') == 'OK':
-                logger.debug(f'Proxy Changed IP: {r.json()["new_ip"]}')
+                logger.debug(f'{index} | Proxy Changed IP: {r.json()["new_ip"]}')
                 break
             elif not 'mobileproxy' in proxy_change_link and r.status_code == 200:
-                logger.debug(f'Proxy Changed IP: {r.text}')
+                logger.debug(f'{index} | Proxy Changed IP: {r.text}')
                 break
-            logger.error(f'Proxy Change IP error: {r.text} | {r.status_code}')
+            logger.error(f'{index} | Proxy Change IP error: {r.text} | {r.status_code}')
             sleep(10)
 
     if proxy:

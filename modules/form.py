@@ -1,5 +1,7 @@
 from loguru import logger
+from time import sleep
 import tls_client
+
 
 class Form:
     def __init__(self, index: int, proxy: str, twitter_username: str, discord: str, wallet_address: str, answer: str):
@@ -180,8 +182,18 @@ class Form:
                     },
                 ],
             }
-            logger.info(f"{self.index} | Trying to send a form...")
-            response = self.client.post('https://dyno.gg/api/forms/ecfaebc1/submit', headers=headers, json=json_data)
+            while True:
+                try:
+                    logger.info(f"{self.index} | Trying to send a form...")
+                    response = self.client.post('https://dyno.gg/api/forms/ecfaebc1/submit', headers=headers, json=json_data)
+                    logger.debug(f'form submit response: {response.text}')
+                    break
+
+                except Exception as err:
+                    if 'request canceled (Client.Timeout exceeded while awaiting headers)' in str(err):
+                        logger.warning(f"{self.index} | Failed to send a form: {err}")
+                        sleep(10)
+                    else: raise Exception(err)
 
             logger.success(f"{self.index} | Form sent successfully.")
             return True
