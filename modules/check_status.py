@@ -3,13 +3,21 @@ from loguru import logger
 from eth_account import Account
 from utilities.common import create_client
 
+
 class CheckStatus():
     def __init__(self, index, private_key, proxy) -> None:
         self.index = index
         self.private_key = private_key
         self.wallet = Account.from_key(private_key)
+
+        if ';' in proxy:
+            proxy_change_link = proxy.split(';')[1]
+            proxy = proxy.split(';')[0]
+        else:
+            proxy_change_link = None
+
         self.proxy = proxy
-        self.client = create_client(proxy)
+        self.client = create_client(proxy, proxy_change_link)
 
 
     def login(self):

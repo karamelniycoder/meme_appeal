@@ -64,6 +64,8 @@ def check_appeal(index, key, proxy, token, answer):
 def main():
     configuration()
     private_keys, tokens, proxies, answers = read_files()
+    while len(proxies) < len(private_keys):
+        proxies.append(proxies[0])
     
     print("Choose an option:")
     print("1. Run checker")

@@ -4,12 +4,17 @@ import tls_client
 class Form:
     def __init__(self, index: int, proxy: str, twitter_username: str, discord: str, wallet_address: str, answer: str):
         self.index = index
-        self.proxy = proxy
+
         self.discord = discord
         self.wallet_address = wallet_address
         self.twitter_username = twitter_username
         self.client: tls_client.Session | None = None
         self.answer = answer
+
+        if ';' in proxy:
+            self.proxy = proxy.split(';')[0]
+        else:
+            self.proxy = proxy
 
         self.__init_data()
 
@@ -194,8 +199,8 @@ class Form:
 
         if proxy:
             session.proxies.update({
-                "http": "http://" + proxy,
-                "https": "http://" + proxy,
+                "http": proxy,
+                "https": proxy,
             })
 
         return session

@@ -1,6 +1,9 @@
 import random
 import requests
+from time import sleep
 from pyuseragents import random as random_useragent
+
+from modules.check_status import logger
 
 
 def read_files():
@@ -21,13 +24,25 @@ def read_files():
 
     return private_keys, tokens, proxies, answers
 
-def create_client(proxy: str) -> requests.Session:
+def create_client(proxy: str, proxy_change_link: str) -> requests.Session:
     session = requests.Session()
+
+    if proxy_change_link:
+        while True:
+            r = session.get(proxy_change_link)
+            if 'mobileproxy' in proxy_change_link and r.json().get('status') == 'OK':
+                logger.debug(f'Proxy Changed IP: {r.json()["new_ip"]}')
+                break
+            elif not 'mobileproxy' in proxy_change_link and r.status_code == 200:
+                logger.debug(f'Proxy Changed IP: {r.text}')
+                break
+            logger.error(f'Proxy Change IP error: {r.text} | {r.status_code}')
+            sleep(10)
 
     if proxy:
         session.proxies.update({
-            "http": "http://" + proxy,
-            "https": "http://" + proxy,
+            "http": proxy,
+            "https": proxy,
         })
 
     session.headers.update({
