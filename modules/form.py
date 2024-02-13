@@ -190,7 +190,7 @@ class Form:
                     break
 
                 except Exception as err:
-                    if 'request canceled (Client.Timeout exceeded while awaiting headers)' in str(err):
+                    if '(Client.Timeout exceeded while awaiting headers)' in str(err) or 'unexpected EOF' in str(err):
                         logger.warning(f"{self.index} | Failed to send a form: {err}")
                         sleep(10)
                     else: raise Exception(err)
