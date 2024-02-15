@@ -1,11 +1,18 @@
-from eth_account.messages import encode_defunct
+from time import sleep
+from random import random
 from loguru import logger
 from eth_account import Account
+from eth_account.messages import encode_defunct
+
 from utilities.common import create_client
 
 
 class CheckStatus:
     def __init__(self, index, private_key, proxy) -> None:
+        sleep(0.1)
+        print('')
+        sleep(0.1)
+
         self.index = index
         self.private_key = private_key
         self.wallet = Account.from_key(private_key)
@@ -36,13 +43,14 @@ class CheckStatus:
             response = self.client.post('https://memefarm-api.memecoin.org/user/wallet-auth', json=json_data, timeout=60)
             response_data = response.json()
             if 'error' in response_data:
-                logger.info(f"| {self.index} | {self.wallet.address} has no points")
+                logger.info(f"{self.index} | {self.wallet.address} has no points")
                 return None
             
             access_token = response_data['accessToken']
             return access_token
         except Exception as e:
-            logger.error(f"Error in login: {e}")
+            logger.debug(f'{self.index} | response | {r.text}')
+            logger.error(f"{self.index} | {self.wallet.address} | Error in login: {e}")
             return None
         
 
@@ -57,13 +65,15 @@ class CheckStatus:
                 response = self.client.get('https://memefarm-api.memecoin.org/user/info')
                 response_data = response.json()
                 username = response_data['twitter']['username']
-                return f"@{username}"
+                if random() > 0.5: return f"@{username}"
+                else: return username
             else:
                 logger.success(f'{self.index} | {self.wallet.address} | Is not robot')
                 return "Not robot"
 
         except Exception as e:
-            logger.error(f"Error in login: {e}")
+            logger.debug(f'{self.index} | response | {r.text}')
+            logger.error(f"{self.index} | {self.wallet.address} | Error in login: {e}")
             return None
 
 
@@ -77,5 +87,5 @@ class CheckStatus:
                 return None
 
         except Exception as e:
-            logger.error(f"Error in login: {e}")
+            logger.error(f"{self.index} | {self.wallet.address} | Error in login: {e}")
             return None

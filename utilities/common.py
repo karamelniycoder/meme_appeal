@@ -1,9 +1,9 @@
 import random
 import requests
 from time import sleep
+from loguru import logger
 from pyuseragents import random as random_useragent
 
-from modules.check_status import logger
 
 
 def read_files():
