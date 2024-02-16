@@ -49,7 +49,7 @@ class CheckStatus:
             access_token = response_data['accessToken']
             return access_token
         except Exception as e:
-            logger.debug(f'{self.index} | response | {r.text}')
+            logger.debug(f'{self.index} | response | {response.text}')
             logger.error(f"{self.index} | {self.wallet.address} | Error in login: {e}")
             return None
         
@@ -72,8 +72,8 @@ class CheckStatus:
                 return "Not robot"
 
         except Exception as e:
-            logger.debug(f'{self.index} | response | {r.text}')
-            logger.error(f"{self.index} | {self.wallet.address} | Error in login: {e}")
+            logger.debug(f'{self.index} | response | {response.text}')
+            logger.error(f"{self.index} | {self.wallet.address} | Error in check win: {e}")
             return None
 
 
@@ -87,5 +87,5 @@ class CheckStatus:
                 return None
 
         except Exception as e:
-            logger.error(f"{self.index} | {self.wallet.address} | Error in login: {e}")
+            logger.error(f"{self.index} | {self.wallet.address} | Error in execute: {e}")
             return None
