@@ -126,6 +126,10 @@ class Form:
                 if '401: Unauthorized' in response.text:
                     logger.error(f"{self.index} | Invalid token")
                     return f"❌ Invalid token"
+                elif 'You need to verify your account in order to perform this action.' in response.text:
+                    logger.error(f"{self.index} | Need email verification")
+                    return f"❌ Need email verification"
+
                 logger.error(f"{self.index} | Failed to get location: {err}: {response.text}")
                 if retry: return self.login(retry=False)
                 return f"❌ Failed to get location: {err}"
@@ -222,8 +226,8 @@ class Form:
                 return "✅ Form sent successfully"
 
             else:
-                logger.error(f"{self.index} | Unknown error: {response.text}")
-                return f"❌ Unknown error: {response.text}"
+                logger.error(f"{self.index} | Unknown error: {response.text[-500:]}")
+                return f"❌ Unknown error: {response.text[-500:]}"
 
         except Exception as err:
             logger.error(f"{self.index} | Failed to send a form: {err}")
@@ -242,5 +246,6 @@ class Form:
                 "http": proxy,
                 "https": proxy,
             })
+            session.headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.3'
 
         return session
