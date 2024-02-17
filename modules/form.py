@@ -1,10 +1,11 @@
+from random import choice
 from loguru import logger
 from time import sleep
 import tls_client
 
 
 class Form:
-    def __init__(self, index: int, proxy: str, twitter_username: str, discord: str, wallet_address: str, answer: str):
+    def __init__(self, index: int, proxy: str, twitter_username: str, discord: str, wallet_address: str, answer: str, form_index: str):
         self.index = index
 
         self.discord = discord
@@ -12,6 +13,8 @@ class Form:
         self.twitter_username = twitter_username
         self.client: tls_client.Session | None = None
         self.answer = answer
+        self.form_index = form_index - 1
+        self.forms_list = ['ecfaebc1', 'cba26bfa']
 
         if ';' in proxy:
             self.proxy = proxy.split(';')[0]
@@ -159,55 +162,57 @@ class Form:
                 if retry: return self.login(retry=False)
                 return f"❌ Failed to send location: {err}"
 
-            headers = {
-                'authority': 'dyno.gg',
-                'accept': 'application/json, text/plain, */*',
-                'cache-control': 'no-cache',
-                'content-type': 'application/json;charset=UTF-8',
-                'origin': 'https://dyno.gg',
-                'pragma': 'no-cache',
-                'referer': 'https://dyno.gg/form/ecfaebc1',
-                'sec-ch-ua-arch': '"x86"',
-                'sec-ch-ua-bitness': '"64"',
-                'sec-ch-ua-mobile': '?0',
-                'sec-ch-ua-model': '""',
-                'sec-ch-ua-platform': '"Windows"',
-                'sec-ch-ua-platform-version': '"15.0.0"',
-                'sec-fetch-dest': 'empty',
-                'sec-fetch-mode': 'cors',
-                'sec-fetch-site': 'same-origin',
-            }
-
-            json_data = {
-                'formData': [
-                    {
-                        'question': 'What is your X handle?',
-                        'type': 'shortAnswer',
-                        'id': '572a',
-                        'required': False,
-                        'answer': self.twitter_username,
-                    },
-                    {
-                        'question': 'What is the wallet address linked to the X handle above?',
-                        'type': 'shortAnswer',
-                        'id': '63f9',
-                        'required': False,
-                        'description': '',
-                        'answer': self.wallet_address,
-                    },
-                    {
-                        'question': 'Please describe your issue',
-                        'type': 'paragraph',
-                        'id': 'b370',
-                        'required': True,
-                        'answer': self.answer,
-                    },
-                ],
-            }
             while True:
+                form_link = self.forms_list[self.form_index] if self.form_index != 2 else choice(self.forms_list)
+                headers = {
+                    'authority': 'dyno.gg',
+                    'accept': 'application/json, text/plain, */*',
+                    'cache-control': 'no-cache',
+                    'content-type': 'application/json;charset=UTF-8',
+                    'origin': 'https://dyno.gg',
+                    'pragma': 'no-cache',
+                    'referer': f'https://dyno.gg/form/{form_link}',
+                    'sec-ch-ua-arch': '"x86"',
+                    'sec-ch-ua-bitness': '"64"',
+                    'sec-ch-ua-mobile': '?0',
+                    'sec-ch-ua-model': '""',
+                    'sec-ch-ua-platform': '"Windows"',
+                    'sec-ch-ua-platform-version': '"15.0.0"',
+                    'sec-fetch-dest': 'empty',
+                    'sec-fetch-mode': 'cors',
+                    'sec-fetch-site': 'same-origin',
+                }
+
+                json_data = {
+                    'formData': [
+                        {
+                            'question': 'What is your X handle?',
+                            'type': 'shortAnswer',
+                            'id': '572a',
+                            'required': False,
+                            'answer': self.twitter_username,
+                        },
+                        {
+                            'question': 'What is the wallet address linked to the X handle above?',
+                            'type': 'shortAnswer',
+                            'id': '63f9',
+                            'required': False,
+                            'description': '',
+                            'answer': self.wallet_address,
+                        },
+                        {
+                            'question': 'Please describe your issue',
+                            'type': 'paragraph',
+                            'id': 'b370',
+                            'required': True,
+                            'answer': self.answer,
+                        },
+                    ],
+                }
+
                 try:
                     # logger.info(f"{self.index} | Trying to send a form...")
-                    response = self.client.post('https://dyno.gg/api/forms/ecfaebc1/submit', headers=headers, json=json_data)
+                    response = self.client.post(f'https://dyno.gg/api/forms/{form_link}/submit', headers=headers, json=json_data)
                     break
 
                 except Exception as err:

@@ -50,7 +50,7 @@ def check(index, key, proxy):
         append_to_file("./data/no_points_proxy.txt", proxy)
     
 
-def check_appeal(index, key, proxy, token, answer, excel):
+def check_appeal(index, key, proxy, token, answer, excel, form_index):
     if not proxy.startswith('http'): proxy = f'http://{proxy}'
 
     login = CheckStatus(index, key, proxy)
@@ -64,7 +64,7 @@ def check_appeal(index, key, proxy, token, answer, excel):
     elif username:
         # append_to_file("./data/to_appeal_private_key.txt", key)
         # append_to_file("./data/to_appeal_proxy.txt", proxy)
-        form = Form(index, proxy, username, token, account.address, answer)
+        form = Form(index, proxy, username, token, account.address, answer, form_index)
         status = form.login()
     else:
         status = "❌ Cannot get twitter username"
@@ -80,11 +80,11 @@ def main():
     while len(proxies) < len(private_keys):
         proxies.append(proxies[0])
     
-    print("Choose an option:")
+    print("\nChoose an option:")
     print("1. Run checker")
     print("2. Run checker + appeal")
     choice = int(input("Enter your choice: "))
-    num_threads = int(input("Enter the number of threads: "))
+    num_threads = int(input("\nEnter the number of threads: "))
 
     excel = Excel(total_len=len(private_keys))
     
@@ -95,9 +95,16 @@ def main():
                 time.sleep(random.randint(PAUSE[0], PAUSE[1]))
 
     elif choice == 2:
+        print("\nChoose a Form:")
+        print("1. ecfaebc1")
+        print("2. cba26bfa")
+        print("3. random")
+        form_index = int(input("Enter your choice: "))
+        if form_index not in [1, 2, 3]: raise Exception(f'Incorrect Form: "{form_index}"')
+
         with ThreadPoolExecutor(max_workers=num_threads) as executor:
             for index, (private_key, token, proxy, answer) in enumerate(zip(private_keys, tokens, proxies, answers)):
-                executor.submit(check_appeal(f"{index+1}/{len(private_keys)}", private_key, proxy, token, answer, excel))
+                executor.submit(check_appeal(f"{index+1}/{len(private_keys)}", private_key, proxy, token, answer, excel, form_index))
                 time.sleep(random.randint(PAUSE[0], PAUSE[1]))
 
 if __name__ == "__main__":
